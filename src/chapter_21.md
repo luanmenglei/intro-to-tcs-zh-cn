@@ -96,7 +96,7 @@ Alice和Bob共享一个**密钥**(secret key)$k \in \{0,1\}^*$。（虽然本书
 
 ```admonish quote title=""
 {{defc}}{def:encryptiondef}[有效加密方案]
-**定义21.1：有效加密方案**
+
 令$L:\N \rightarrow \N$和$C:\N \rightarrow \N$为两个从自然数映射到自然数的函数。一对将字符串映射到字符串的多项式时间可计算函数$(E,D)$，如果对于每个$n\in \N$，$k\in \{0,1\}^n$和$x \in \{0,1\}^{L(n)}$，都有$|E_k(x)|= C(n)$ 且 
 $$
 D(k,E(k,x))=x \;. {{numeq}}{eq:eqvalidenc}
@@ -166,322 +166,265 @@ $$
 由于随机性对安全性至关重要，破坏生成随机性的过程可能导致使用该随机性的系统完全崩溃。事实上，Snowden泄露的文件，结合Shumow和Ferguson的观察，[强烈暗示](https://en.wikipedia.org/wiki/Dual_EC_DRBG)美国国家安全局在美国国家标准与技术研究院发布的一个伪随机数生成器中故意插入了**后门**。幸运的是，这个生成器没有被广泛采用，但显然美国国家安全局确实向RSA安全公司支付了1000万美元，以便后者将这个生成器设为它们产品的默认选项。
 ```
 
-## Perfect secrecy
+## 完美保密性
 
-If you think about encryption scheme security for a while, you might come up with the following principle for defining security: _"An encryption scheme is secure if it is not possible to recover the key $k$ from $E_k(x)$"_.
-However,  a moment's thought shows that the key is not really what we're trying to protect.
-After all, the whole point of an encryption is to protect the confidentiality of the _plaintext_ $x$.
-So, we can try to define that _"an encryption scheme is secure if it is not possible to recover the plaintext $x$ from $E_k(x)$"_.
-Yet it is not clear what this means either.
-Suppose that an encryption scheme reveals the first 10 bits of the plaintext $x$.
-It might still not be possible to recover $x$ completely, but on an intuitive level, this seems like it would be extremely unwise to use such an encryption scheme in practice.
-Indeed, often even _partial information_ about the plaintext is enough for the adversary to achieve its goals.
+如果你思考一段时间的加密方案安全性，你可能会提出以下定义安全性的原则：**"如果一个加密方案无法从 $E_k(x)$ 中恢复出密钥 $k$，那么它就是安全的"**。然而，稍加思考就会发现，密钥并不是我们真正想要保护的东西。毕竟，加密的全部意义在于保护**明文** $x$ 的机密性。因此，我们可以尝试这样定义：**"如果一个加密方案无法从 $E_k(x)$ 中恢复出明文 $x$，那么它就是安全的"**。但这似乎也不明确。假设一个加密方案泄露了明文 $x$ 的前 10 个比特。它可能仍然无法完全恢复 $x$，但从直觉上看，在实践中使用这样的加密方案似乎极其不明智。事实上，通常即使是明文的**部分信息**也足以让对手实现其目标。
 
-The above thinking led Shannon in 1945 to formalize the notion of _perfect secrecy_, which is that an encryption reveals absolutely nothing about the message.
-There are several equivalent ways to define it, but perhaps the cleanest one is the following:
+上述思考促使香农在1945年形式化了**完美保密性**的概念，即加密不会泄露关于消息的任何信息。有几种等价的方式来定义它，但或许最简洁的定义如下：
 
-::: {.definition title="Perfect secrecy" #perfectsecrecy}
-A valid encryption scheme $(E,D)$ with plaintext length $L(\cdot)$ is _perfectly secret_ if for every $n\in \N$ and plaintexts $x,x' \in \{0,1\}^{L(n)}$, the following two distributions $Y$ and $Y'$ over $\{0,1\}^*$ are identical:
+```admonish quote title=""
+{{defc}}{def:perfectsecrecy}[完美保密性]
 
-* $Y$ is obtained by sampling  $k\sim \{0,1\}^n$ and outputting $E_k(x)$.
+一个有效的加密方案 $(E,D)$，其明文长度为 $L(\cdot)$，如果对于每个 $n\in \N$ 以及每个长度为 $L(n)$ 的明文 $x,x' \in \{0,1\}^{L(n)}$，以下两个在 $\{0,1\}^*$ 上的分布 $Y$ 和 $Y'$ 是**完全相同**的，则该方案具有**完美保密性**：
 
-* $Y'$ is obtained by sampling  $k\sim \{0,1\}^n$ and outputting $E_k(x')$.
-:::
+* $Y$ 是通过采样 $k\sim \{0,1\}^n$ 并输出 $E_k(x)$ 得到的分布。
+* $Y'$ 是通过采样 $k\sim \{0,1\}^n$ 并输出 $E_k(x')$ 得到的分布。
+```
 
-::: { .pause }
-This definition might take more than one reading to parse. Try to think of how this condition would correspond to your intuitive notion of "learning no information" about $x$ from observing $E_k(x)$, and to Shannon's quote in the beginning of this chapter.
+```admonish pause title="暂停一下"
+这个定义可能需要阅读多次才能理解。试着思考这个条件如何对应于你对从观察 $E_k(x)$ 中"不获取关于 $x$ 的任何信息"这一直观概念，以及如何对应本章开头香农的引述。
 
-In particular, suppose that you knew ahead of time that Alice sent either an encryption of $x$ or an encryption of $x'$. Would you learn anything new from observing the encryption of the message that Alice actually sent? It may help you to look at [perfectsecfig](){.ref}.
-:::
+特别地，假设你事先知道 Alice 发送的是 $x$ 的加密或者是 $x'$ 的加密。观察 Alice 实际发送的消息的加密结果，你是否会从中了解到任何新信息？查看{{ref:fig:perfectsec}}可能会对你有所帮助。
+```
 
+```admonish pic id="perfectsecfig"
+![perfectsecfig](./images/chapter21/perfectsecrecy.png) 
 
-![For any key length $n$, we can visualize an encryption scheme $(E,D)$ as a graph with a vertex for every one of the $2^{L(n)}$ possible plaintexts and for every one of the ciphertexts in $\{0,1\}^*$ of the form $E_k(x)$ for $k\in \{0,1\}^n$ and $x\in \{0,1\}^{L(n)}$. For every plaintext $x$ and key $k$, we add an edge labeled $k$ between $x$ and $E_k(x)$. By the validity condition, if we pick any fixed key $k$, the map $x \mapsto E_k(x)$ must be one-to-one. The condition of perfect secrecy simply corresponds to requiring that every two    plaintexts $x$ and $x'$ have exactly the same set of neighbors (or multi-set, if there are parallel edges).](../figure/perfectsecrecy.png){#perfectsecfig .margin  }
+{{pic}}{fig:perfectsec} 对于任意密钥长度 $n$，我们可以将加密方案 $(E,D)$ 可视化为一个图，其中包含 $2^{L(n)}$ 个可能的明文顶点，以及所有形如 $E_k(x)$（其中 $k\in \{0,1\}^n$，$x\in \{0,1\}^{L(n)}$）的密文顶点。对于每个明文 $x$ 和密钥 $k$，我们在 $x$ 和 $E_k(x)$ 之间添加一条标记为 $k$ 的边。根据有效性的条件，如果我们选取任意固定的密钥 $k$，那么映射 $x \mapsto E_k(x)$ 必须是单射。完美保密性的条件简单地说就是要求任意两个明文 $x$ 和 $x'$ 拥有完全相同的邻居集合（如果存在平行边，则是多重集）。
+```
 
-### Example: Perfect secrecy in the battlefield
+### 示例：战场上的完美保密性
 
-To understand [perfectsecrecy](){.ref}, suppose that Alice sends only one of two possible messages: "attack" or "retreat", which we denote by $x_0$ and $x_1$ respectively, and that she sends each one of those messages with probability $1/2$.
-Let us put ourselves in the shoes of _Eve_, the eavesdropping adversary.
-A priori we would have guessed that Alice sent either $x_0$ or $x_1$ with probability $1/2$.
-Now we observe $y=E_k(x_i)$ where $k$ is a uniformly chosen key in $\{0,1\}^n$.
-How does this new information cause us to update our beliefs on whether Alice sent the plaintext $x_0$ or the plaintext $x_1$?
+为了理解{{ref:def:perfectsecrecy}}，假设 Alice 只发送两条可能消息中的一条："进攻"或"撤退"，我们分别用 $x_0$ 和 $x_1$ 表示，并且她发送每条消息的概率都是 $1/2$。让我们设身处地地想象我们是窃听者 Eve。先验地，我们会猜测 Alice 发送 $x_0$ 或 $x_1$ 的概率各为 $1/2$。现在我们观察到 $y=E_k(x_i)$，其中 $k$ 是从 $\{0,1\}^n$ 中均匀选择的密钥。这个新信息如何改变我们对 Alice 发送的是明文 $x_0$ 还是明文 $x_1$ 的信念？
 
-> ### { .pause }
-Before reading the next paragraph, you might want to try the analysis yourself.
-You may find it useful to look at the [Wikipedia entry on Bayesian Inference](https://en.wikipedia.org/wiki/Bayesian_inference) or [these MIT lecture notes](https://ocw.mit.edu/courses/mathematics/18-05-introduction-to-probability-and-statistics-spring-2014/readings/MIT18_05S14_Reading11.pdf).
+```admonish pause title="暂停一下"
+在阅读下一段之前，你可能想自己尝试分析一下。查看关于[贝叶斯推断的 Wikipedia 条目](https://en.wikipedia.org/wiki/Bayesian_inference)或[这些 MIT 讲义](https://ocw.mit.edu/courses/mathematics/18-05-introduction-to-probability-and-statistics-spring-2014/readings/MIT18_05S14_Reading11.pdf)可能会有所帮助。
+```
 
-Let us define $p_0(y)$ to be the probability (taken over $k\sim \{0,1\}^n$) that $y=E_k(x_0)$ and similarly $p_1(y)$ to be $\Pr_{k \sim \{0,1\}^n}[y=E_k(x_1)]$.
-Note that, since Alice chooses the message to send at random, our a priori probability for observing $y$ is $\tfrac{1}{2}p_0(y) + \tfrac{1}{2}p_1(y)$.
-However, as per [perfectsecrecy](){.ref},   the perfect secrecy condition guarantees that $p_0(y)=p_1(y)$!
-Let us denote the number $p_0(y)=p_1(y)$ by $p$.
-By the formula for conditional probability, the probability that Alice sent the message $x_0$ conditioned on our observation $y$ is simply
+让我们定义 $p_0(y)$ 为（在 $k\sim \{0,1\}^n$ 上）$y=E_k(x_0)$ 的概率，类似地，$p_1(y)$ 为 $\Pr_{k \sim \{0,1\}^n}[y=E_k(x_1)]$。注意，由于 Alice 随机选择要发送的消息，我们观察到 $y$ 的先验概率是 $\tfrac{1}{2}p_0(y) + \tfrac{1}{2}p_1(y)$。然而，根据{{ref:def:perfectsecrecy}}，完美保密性条件保证 $p_0(y)=p_1(y)$！我们将 $p_0(y)=p_1(y)$ 这个值记为 $p$。根据条件概率公式，在我们观察到 $y$ 的条件下，Alice 发送了消息 $x_0$ 的概率就是
 $$
-\Pr[i=0 | y=E_k(x_i)] = \frac{\Pr[i=0 \wedge y = E_k(x_i)]}{\Pr[y = E_k(x)]} \;. \label{bayeseq}
+\Pr[i=0 | y=E_k(x_i)] = \frac{\Pr[i=0 \wedge y = E_k(x_i)]}{\Pr[y = E_k(x)]} \;{{numeq}}{eq:bayeseq}
 $$
 
-(The equation [bayeseq](){.eqref} is a special case of _Bayes' rule_ which, although a simple restatement of the formula for conditional probability, is an extremely important and widely used tool in statistics and data analysis.)
+（方程{{eqref:eq:bayeseq}}是**贝叶斯规则**的一个特例，虽然它只是条件概率公式的简单重述，但在统计学和数据分析中是一个极其重要且广泛使用的工具。）
 
-Since the probability that $i=0$ and $y$ is the ciphertext $E_k(0)$ is equal to $\tfrac{1}{2}\cdot p_0(y)$, and the a priori probability of observing $y$ is $\tfrac{1}{2}p_0(y) + \tfrac{1}{2}p_1(y)$,
-we can rewrite [bayeseq](){.eqref} as
+因为 $i=0$ 且 $y$ 是密文 $E_k(0)$ 的概率等于 $\tfrac{1}{2}\cdot p_0(y)$，而观察到 $y$ 的先验概率是 $\tfrac{1}{2}p_0(y) + \tfrac{1}{2}p_1(y)$，我们可以将{{eqref:eq:bayeseq}}重写为
 $$
 \Pr[i=0 | y=E_k(x_i)] = \frac{\tfrac{1}{2}p_0(y)}{\tfrac{1}{2}p_0(y)+\tfrac{1}{2}p_1(y)}  =  \frac{p}{p +p}  = \frac{1}{2}
 $$
-using the fact that $p_0(y)=p_1(y)=p$.
-This means that observing the ciphertext $y$ did not help us at all! We still would not be able to guess whether Alice sent "attack" or "retreat" with better than 50/50 odds!
+这里用到了 $p_0(y)=p_1(y)=p$ 这一事实。这意味着观察到密文 $y$ 对我们没有任何帮助！我们仍然无法以优于 50/50 的几率猜测 Alice 发送的是"进攻"还是"撤退"！
 
-This example can be vastly generalized to show that perfect secrecy is indeed "perfect" in the sense that observing a ciphertext gives Eve _no additional information_ about the plaintext beyond her a priori knowledge.
+这个例子可以广泛推广，以表明完美保密性确实是"完美的"，因为观察密文不会给 Eve 带来任何关于明文的**额外信息**，除了她先验已知的信息之外。
 
-### Constructing perfectly secret encryption
+### 构建完美保密的加密方案
 
-_Perfect secrecy_ is an extremely strong condition, and implies that an eavesdropper does not learn _any_ information from observing the ciphertext.
-You might think that an encryption scheme satisfying such a strong condition will be impossible, or at least extremely complicated, to achieve.
-However it turns out we can in fact obtain a perfectly secret encryption scheme fairly easily.
-Such a scheme for two-bit messages is illustrated in [onetimepadtwofig](){.ref}.
+**完美保密性**是一个非常强的条件，它意味着窃听者从观察密文中不会学到**任何**信息。你可能认为满足如此强条件的加密方案是不可能实现的，或者至少实现起来极其复杂。但事实证明，我们可以相当容易地获得一个完美保密的加密方案。{{ref:fig:onetimepadtwo}}展示了一个针对两比特消息的此类方案。
 
+```admonish pic id="onetimepadtwofig"
+![onetimepadtwofig](./images/chapter21/onetimepadtwobits.png) 
 
-![A perfectly secret encryption scheme for two-bit keys and messages. The blue vertices represent plaintexts and the red vertices represent ciphertexts, each edge mapping a plaintext $x$ to a ciphertext $y=E_k(x)$ is labeled with the corresponding key $k$. Since there are four possible keys, the degree of the graph is four and it is in fact a complete bipartite graph. The encryption scheme is valid in the sense that for every $k\in \{0,1\}^2$, the map $x \mapsto E_k(x)$ is one-to-one, which in other words means that the set of edges labeled with $k$ is a _matching_.](../figure/onetimepadtwobits.png){#onetimepadtwofig .margin  }
+{{pic}}{fig:onetimepadtwo} 一个针对两比特密钥和两比特明文的完美保密加密方案。蓝色顶点代表明文，红色顶点代表密文，每条将明文 $x$ 映射到密文 $y=E_k(x)$ 的边都标有相应的密钥 $k$。因为有四种可能的密钥，所以该图的度为4，实际上它是一个完全二分图。该加密方案是有效的，因为对于每个 $k\in \{0,1\}^2$，映射 $x \mapsto E_k(x)$ 都是单射，换句话说，标有 $k$ 的边集构成一个**完美匹配**。
+```
 
-In fact, this can be generalized to any number of bits:
+事实上，这可以推广到任意数量的比特：
 
+```admonish quote title=""
+{{thmc}}{thm:perfectsecrecy}[一次性密码本(Vernam 1917, Shannon 1949)]
 
-> ### {.theorem title="One Time Pad (Vernam 1917, Shannon 1949)" #onetimepad}
-There is a perfectly secret valid encryption scheme $(E,D)$ with $L(n)=C(n)=n$.
+存在一个完美保密的有效加密方案 $(E,D)$，其满足 $L(n)=C(n)=n$。
+```
 
-> ### {.proofidea data-ref="onetimepad"}
-Our scheme is the [one-time pad](https://en.wikipedia.org/wiki/One-time_pad) also known as the "Vernam Cipher", see [onetimepadfig](){.ref}.
-The encryption is exceedingly simple: to encrypt a message $x\in \{0,1\}^n$ with a key $k \in \{0,1\}^n$ we simply output $x \oplus k$ where $\oplus$ is the bitwise XOR operation that
-outputs the string corresponding to XORing each coordinate of $x$ and $k$.
+```admonish proof collapsible=true title="{{ref:thm:perfectsecrecy}}的证明思路"
+我们的方案是一次性密码本，也称为"Vernam密码"，见{{ref:fig:onetimepadtwo}}。加密过程非常简单：要使用密钥 $k \in \{0,1\}^n$ 加密消息 $x\in \{0,1\}^n$，我们只需输出 $x \oplus k$，其中 $\oplus$ 是按位异或运算，输出的是将 $x$ 和 $k$ 的每个坐标进行异或后得到的字符串。
+```
 
+```admonish proof collapsible=true title="{{ref:thm:perfectsecrecy}}的证明"
+对于两个长度相同为 $n$ 的二进制串 $a$ 和 $b$，我们定义 $a \oplus b$ 为串 $c \in \{0,1\}^n$，使得对于每个 $i\in [n]$，有 $c_i = a_i + b_i \mod 2$。加密方案 $(E,D)$ 定义如下：$E_k(x) = x\oplus k$ 且 $D_k(y)= y \oplus k$。根据加法结合律（模二也成立），$D_k(E_k(x))=(x\oplus k) \oplus k = x \oplus (k \oplus k) = x \oplus 0^n = x$，这里用到了对于每个比特 $\sigma \in \{0,1\}$，有 $\sigma + \sigma \mod 2 = 0$ 且 $\sigma + 0 = \sigma \mod 2$。因此 $(E,D)$ 构成了一个有效的加密方案。
 
-::: {.proof data-ref="onetimepad"}
-For two binary strings $a$ and $b$ of the same length $n$, we define $a \oplus b$ to be the string $c \in \{0,1\}^n$ such that $c_i = a_i + b_i \mod 2$ for every $i\in [n]$.
-The encryption scheme $(E,D)$ is defined as follows: $E_k(x) = x\oplus k$ and $D_k(y)= y \oplus k$.
-By the associative law of addition (which works also modulo two), $D_k(E_k(x))=(x\oplus k) \oplus k = x \oplus (k \oplus k) = x \oplus 0^n = x$,
-using the fact that for every bit $\sigma \in \{0,1\}$, $\sigma + \sigma \mod 2 = 0$ and $\sigma + 0 = \sigma \mod 2$.
-Hence $(E,D)$ form a valid encryption.
+为了分析完美保密性，我们断言对于每个 $x\in \{0,1\}^n$，分布 $Y_x=E_k(x)$（其中 $k \sim \{0,1\}^n$）就是 $\{0,1\}^n$ 上的均匀分布，因此特别地，对于每个 $x,x' \in \{0,1\}^n$，分布 $Y_{x}$ 和 $Y_{x'}$ 是相同的。实际上，对于每个特定的 $y\in \{0,1\}^n$，值 $y$ 被 $Y_x$ 输出当且仅当 $y = x \oplus k$，这成立当且仅当 $k= x \oplus y$。由于 $k$ 是从 $\{0,1\}^n$ 中均匀随机选取的，$k$ 恰好等于 $x \oplus y$ 的概率正好是 $2^{-n}$，这意味着每个串 $y$ 被 $Y_x$ 输出的概率都是 $2^{-n}$。
+```
 
-To analyze the perfect secrecy property, we claim that for every $x\in \{0,1\}^n$, the distribution $Y_x=E_k(x)$ where $k \sim \{0,1\}^n$ is simply the uniform distribution over $\{0,1\}^n$, and hence in particular the distributions $Y_{x}$ and $Y_{x'}$ are identical for every $x,x' \in \{0,1\}^n$.
-Indeed, for every particular $y\in \{0,1\}^n$, the value $y$ is output by $Y_x$ if and only if $y = x \oplus k$ which holds if and only if $k= x \oplus y$. Since $k$ is chosen uniformly at random in $\{0,1\}^n$, the probability that $k$ happens to equal $x \oplus y$ is exactly $2^{-n}$, which means that every string $y$ is output by $Y_x$ with probability $2^{-n}$.
-:::
+```admonish pic id="onetimepadfig"
+![onetimepadfig](./images/chapter21/onetimepad.png) 
 
+{{pic}}{fig:onetimepadtwo} 在**一次性密码本**加密方案中，我们使用密钥 $k\in \{0,1\}^n$ 将明文 $x\in \{0,1\}^n$ 加密为密文 $x \oplus k$，其中 $\oplus$ 表示按位异或运算。
+```
 
-![In the _one time pad_ encryption scheme we encrypt a plaintext $x\in \{0,1\}^n$ with a key $k\in \{0,1\}^n$ by the ciphertext $x \oplus k$ where $\oplus$ denotes the bitwise XOR operation.](../figure/onetimepad.png){#onetimepadfig .margin  }
+```admonish pause title="暂停一下"
+上述论证相当简单，但值得再读一遍。为了理解为什么一次性密码本是完美保密的，将其设想为我们在{{ref:fig:onetimepadtwo}}中所做的二分图是很有帮助的。（实际上，图21.8中的加密方案正是 $n=2$ 时的一次性密码本。）对于每个 $n$，一次性密码本加密方案对应于一个二分图，其"左侧"有 $2^n$ 个顶点，对应于 $\{0,1\}^n$ 中的明文；"右侧"有 $2^n$ 个顶点，对应于密文 $\{0,1\}^n$。对于每个 $x\in \{0,1\}^n$ 和 $k\in \{0,1\}^n$，我们将 $x$ 与顶点 $y=E_k(x)$ 用一条标记为 $k$ 的边连接起来。可以看出，这是一个完全二分图，其中左侧的每个顶点都连接到_所有_右侧的顶点。这尤其意味着，对于每个左侧顶点 $x$，通过随机选取 $k\in \{0,1\}^n$ 并沿着标记为 $k$ 的边走到 $x$ 的邻居而得到的密文分布，正是 $\{0,1\}^n$ 上的均匀分布。这确保了完美保密性条件。
+```
 
+## 长密钥的必要性
 
-> ### { .pause }
-The argument above is quite simple but is worth reading again. To understand why the one-time pad is perfectly secret, it is useful to envision it as a bipartite graph as we've done in [onetimepadtwofig](){.ref}.
-(In fact the encryption scheme of [onetimepadtwofig](){.ref} is precisely the one-time pad for $n=2$.) For every $n$, the one-time pad encryption scheme corresponds to a bipartite graph with $2^n$  vertices on the "left side" corresponding to the plaintexts in $\{0,1\}^n$ and $2^n$  vertices on the "right side" corresponding to the ciphertexts $\{0,1\}^n$.
-For every $x\in \{0,1\}^n$ and $k\in \{0,1\}^n$, we connect $x$ to the vertex $y=E_k(x)$ with an edge that we label with $k$.
-One can see that this is the complete bipartite graph, where every vertex on the left is connected to _all_ vertices on the right.
-In particular this means that for every left vertex $x$, the distribution on the ciphertexts obtained by taking a random $k\in \{0,1\}^n$ and going to the neighbor of $x$ on the edge labeled $k$ is the uniform distribution over $\{0,1\}^n$.
-This ensures the perfect secrecy condition.
+那么，{{ref:thm:perfectsecrecy}}是否给出了密码学的最终定论，并意味着我们都可以进行完美保密的通信，并从此过上幸福的生活呢？并非如此。虽然一次性密码本是高效的，并且提供了完美保密性，但它有一个明显的缺点：要通信 n 比特，你需要存储一个长度为 n 的密钥。相比之下，实际使用的密码系统，如 AES-128，只有 128 比特（即 16 字节）的短密钥，却可以用于保护 TB 级甚至更多的通信！想象一下，如果我们都必须使用一次性密码本。如果是这样，那么如果你需要与 m 个人通信，你就必须（安全地！）维护 m 个巨大的文件，每个文件都与你预期与该人通信的最大总长度相当。想象一下，每次你在亚马逊、谷歌或任何其他服务开设账户时，他们都需要通过邮件（理想情况下是用安全的信使）给你寄一张装满随机数的 DVD，而每次你怀疑有病毒时，你都需要向所有这些服务索要一张新的 DVD。这听起来可不太吸引人。
 
-## Necessity of long keys
+这不仅仅是一个理论问题。苏联从 1940 年代之前就开始使用一次性密码本进行机密通信。事实上，甚至在香农的工作之前，美国情报部门在 1941 年就已经知道一次性密码本在原则上是"不可破译的"（见[Venona 文件](http://nsarchive.gwu.edu/NSAEBB/NSAEBB278/01.PDF)第 32 页）。然而，结果证明，为所有通信制造如此多密钥的麻烦给苏联带来了负面影响，他们最终为了发送多于一条的消息而重复使用了相同的密钥。他们确实试图将相同的密钥用于完全不同的接收者，错误地希望这样不会被发现。美国陆军的[Venona 项目](https://en.wikipedia.org/wiki/Venona_project)由 Gene Grabeel（见{{ref:fig:genegrabeel}}，一位来自弗吉尼亚州麦迪逊高地的前家政学教师）和 Leonard Zubko 中尉于 1943 年 2 月创立。1943 年 10 月，当他们发现俄罗斯人正在重复使用其密钥时，该项目取得了突破。在其存在的 37 年里，该项目产生了一笔情报宝藏，揭露了在美国和其他国家的数百名克格勃特工和俄罗斯间谍，包括Julius Rosenberg, Harry Gold, Klaus Fuchs, Alger Hiss, Harry Dexter White等等。
 
-So, does [onetimepad](){.ref} give the final word on cryptography, and means that we can all communicate with perfect secrecy and live happily ever after?
-No it doesn't.
-While the one-time pad is efficient, and gives perfect secrecy, it has one glaring disadvantage: to communicate $n$ bits you need to store a key of length $n$.
-In contrast, practically used cryptosystems such as AES-128 have a short key of $128$ bits (i.e., $16$ bytes) that can be used to protect terabytes or more of communication!
-Imagine that we all needed to use the one time pad.
-If that was the case, then if you had to communicate with $m$ people, you would have to maintain (securely!)
-$m$ huge files that are each as long as the length of the maximum total communication you expect with that person.
-Imagine that every time you opened an account with Amazon, Google, or any other service, they would need to send you in the mail (ideally with a secure courier) a DVD full of random numbers,
-and every time you suspected a virus, you'd need to ask all these services for a fresh DVD. This doesn't sound so appealing.
+```admonish pic id="genegrabeelfig"
+![genegrabeelfig](./images/chapter21/genevenona.png) 
 
+{{pic}}{fig:genegrabeel} Gene Grabeel，她于 1943 年 2 月 1 日创立了美国俄罗斯SigInt项目。照片摄于 1942 年，见Venona 历史研究第 7 页。
+```
 
+```admonish pic id="longkeygraphfig"
+![longkeygraphfig](./images/chapter21/longkeygraph.png) 
 
-This is not just a theoretical issue.
-The Soviets have used the one-time pad for their confidential communication since before the 1940's.
-In fact,  even before Shannon's work, the U.S. intelligence already knew in 1941 that the one-time pad is in principle "unbreakable"  (see page 32 in the [Venona document](http://nsarchive.gwu.edu/NSAEBB/NSAEBB278/01.PDF)).
-However, it turned out that the hassle of manufacturing so many keys for all the communication took its toll on the Soviets and they ended up reusing the same keys
-for more than one message.  They did try to use them for completely different receivers in the (false) hope that this wouldn't be detected.
-The [Venona Project](https://en.wikipedia.org/wiki/Venona_project) of the U.S. Army was founded in February 1943 by Gene Grabeel (see [genegrabeelfig](){.ref}), a former home economics teacher from Madison Heights, Virgnia and Lt. Leonard Zubko.
-In October 1943, they had their breakthrough when it was discovered that the Russians were reusing their keys.
-In the 37 years of its existence, the project has resulted in a treasure chest of intelligence, exposing hundreds of KGB agents and Russian spies in the U.S. and other countries,
-including Julius Rosenberg, Harry Gold, Klaus Fuchs, Alger Hiss, Harry Dexter White and many others.
+{{pic}}{fig:longkeygraph} 一个密钥数量少于明文数量的加密方案对应于一个二分图，其中左侧的度数小于顶点数。结合有效性条件，这意味着将存在两个左侧顶点 $x,x'$ 具有不完全相同的邻域，因此该方案并**不**满足完美保密性。
+```
 
-![Gene Grabeel, who founded the U.S. Russian SigInt program on 1 Feb 1943.  Photo taken in 1942, see Page 7 in the Venona historical study.](../figure/genevenona.png){#genegrabeelfig .margin  }
+不幸的是，事实证明，如此长的密钥对于完美保密性来说是**必需的**：
 
+```admonish quote title=""
+{{thmc}}{thm:longkeysthm}[完美保密性需要长密钥]
 
+对于每一个完美保密性的加密方案 $(E,D)$，长度函数 $L$ 满足 $L(n) \leq n$。
+```
 
+```admonish proof collapsible=true title="{{ref:thm:longkeysthm}}的证明思路"
+证明背后的思想如{{ref:fig:longkeygraph}}所示。我们在明文和密文之间定义一个图，如果存在某个密钥 $k$ 使得 $y=E_k(x)$，则在明文 $x$ 和密文 $y$ 之间连一条边。这个图的**度数**最多等于潜在密钥的数量。度数小于明文数量（因此也小于密文数量）这一事实意味着将存在两个具有不同邻居集合的明文 $x$ 和 $x'$，因此对应于 $x$ 的密文分布（使用随机密钥）将与对应于 $x'$ 的密文分布不相同。
+```
 
-![An encryption scheme where the number of keys is smaller than the number of plaintexts corresponds to a bipartite graph where the degree is smaller than the number of vertices on the left side. Together with the validity condition this implies that there will be two left vertices $x,x'$ with non-identical neighborhoods, and hence the scheme does _not_ satisfy perfect secrecy.](../figure/longkeygraph.png){#longkeygraphfig .margin  }
+```admonish proof collapsible=true title="{{ref:thm:longkeysthm}}的证明"
+设 $E,D$ 是一个有效的加密方案，其消息长度为 $L$，密钥长度为 $n<L$。我们将通过提供两个明文 $x_0,x_1 \in \{0,1\}^L$ 来证明 $(E,D)$ 不是完美保密的，使得分布 $Y_{x_0}$ 和 $Y_{x_1}$ 不相同，其中 $Y_x$ 是通过选取 $k \sim \{0,1\}^n$ 并输出 $E_k(x)$ 得到的分布。
 
+我们选择 $x_0 = 0^L$。设 $S_0 \subseteq \{0,1\}^*$ 是在 $Y_{x_0}$ 中输出概率非零的所有密文的集合。即 $S_0=\{ y \;|\; \exists_{k\in \{0,1\}^n} y=E_k(x_0) \}$。因为只有 $2^n$ 个密钥，我们知道 $|S_0| \leq 2^n$。
 
+我们将证明以下断言：
 
-Unfortunately it turns out that such long keys are _necessary_ for perfect secrecy:
+**断言1：** 存在某个 $x_1 \in \{0,1\}^L$ 和 $k\in \{0,1\}^n$ 使得 $E_k(x_1) \not\in S_0$。
 
-> ### {.theorem title="Perfect secrecy requires long keys" #longkeysthm}
-For every perfectly secret encryption scheme $(E,D)$ the length function $L$ satisfies $L(n) \leq n$.
+断言1意味着字符串 $E_k(x_1)$ 被 $Y_{x_1}$ 输出的概率为正，而被 $Y_{x_0}$ 输出的概率为零，因此特别地，$Y_{x_0}$ 和 $Y_{x_1}$ 不相同。为了证明断言1，只需选择一个固定的 $k\in \{0,1\}^n$。根据有效性条件，映射 $x \mapsto E_k(x)$ 是从 $\{0,1\}^L$ 到 $\{0,1\}^*$ 的一一映射，因此特别地，此映射的**像**，即集合 $I_k = \{ y \;|\; \exists_{x\in \{0,1\}^L} y=E_k(x) \}$ 的大小至少为（实际上恰好为）$2^L$。由于 $|S_0| \leq 2^n < 2^L$，这意味着 $|I_k|>|S_0|$，因此特别地，存在某个字符串 $y$ 属于 $I_k \setminus S_0$。但根据 $I_k$ 的定义，这意味着存在某个 $x\in \{0,1\}^L$ 使得 $E_k(x) \not\in S_0$，这就完成了断言1的证明，从而也完成了{{ref:thm:longkeysthm}}的证明。
+```
 
-> ### {.proofidea data-ref="longkeysthm"}
-The idea behind the proof is illustrated in [longkeygraphfig](){.ref}. We define a graph between the plaintexts and ciphertexts, where we put an edge between plaintext $x$ and ciphertext $y$ if there is some key $k$ such that  $y=E_k(x)$. The _degree_ of this graph is at most the number of potential keys. The fact that the degree is smaller than the number of plaintexts (and hence of ciphertexts) implies that there would be two plaintexts $x$ and $x'$ with different sets of neighbors, and hence the distribution of a ciphertext corresponding to $x$ (with a random key) will not be identical to the distribution of a ciphertext corresponding to $x'$. 
+## 计算保密性
 
-::: {.proof data-ref="longkeysthm"}
-Let $E,D$ be a valid encryption scheme with messages of length $L$ and key of length $n<L$.
-We will show that $(E,D)$ is not perfectly secret by providing two plaintexts $x_0,x_1 \in \{0,1\}^L$ such that the distributions $Y_{x_0}$ and $Y_{x_1}$ are not identical, where $Y_x$ is the distribution obtained by picking $k \sim \{0,1\}^n$ and outputting $E_k(x)$.
+总结前文，我们现在知道：
 
+* 可以获得密钥长度与明文相同的完美保密性加密方案。
+* 不可能获得密钥比明文短（甚至是只短一个比特）的此类方案。
 
-We choose $x_0 = 0^L$.
-Let $S_0 \subseteq \{0,1\}^*$ be the set of all ciphertexts that have non-zero probability of being output in $Y_{x_0}$. That is, $S_0=\{ y \;|\; \exists_{k\in \{0,1\}^n} y=E_k(x_0) \}$.
-Since there are only $2^n$ keys, we know that $|S_0| \leq 2^n$.
+这与我们已知的事实如何协调？即人们通常使用的密码系统，其密钥仅为 16 字节（即 128 位），却可以加密数 TB 的明文。{{ref:thm:longkeysthm}}的证明确实给出了一种破解所有这些密码系统的方法，但对该证明的检验表明，它仅能得出一个时间开销为**密钥长度指数级**的算法。这促使我们将完美保密性条件放宽为一种称为**计算保密性**(computational secrecy)的条件。直观地讲，如果一个加密方案没有多项式时间算法能够攻破它，那么它在计算上是保密的。其正式定义如下：
 
+```admonish quote title=""
+{{defc}}{def:compsecdef}[计算保密性]
 
-We will show the following claim:
-
-__Claim I:__ There exists some $x_1 \in \{0,1\}^L$ and $k\in \{0,1\}^n$ such that $E_k(x_1) \not\in S_0$.
-
-
-Claim I implies that the string $E_k(x_1)$ has positive probability of being output by $Y_{x_1}$  and zero probability of being output by $Y_{x_0}$ and hence in particular $Y_{x_0}$ and $Y_{x_1}$ are not identical.
-To prove Claim I, just choose a fixed $k\in \{0,1\}^n$. By the validity condition, the map $x \mapsto E_k(x)$ is a one to one map of $\{0,1\}^L$ to $\{0,1\}^*$ and hence in particular
-the _image_ of this map which is the set $I_k = \{ y \;|\; \exists_{x\in \{0,1\}^L} y=E_k(x) \}$ has size at least (in fact exactly) $2^L$.
-Since $|S_0| \leq 2^n < 2^L$, this means that $|I_k|>|S_0|$ and so in particular there exists some string $y$ in $I_k \setminus S_0$. But by the definition of $I_k$ this means that there is some $x\in \{0,1\}^L$  such that $E_k(x) \not\in S_0$ which concludes the proof of Claim I and hence of  [longkeysthm](){.ref}.
-:::
-
-
-## Computational secrecy
-
-To sum up the previous episodes, we now know that:
-
-* It is possible to obtain a perfectly secret encryption scheme with key length the same as the plaintext.
-
-and
-
-* It is not possible to obtain such a scheme with key that is even a single bit shorter than the plaintext.
-
-How does this mesh with the fact that, as we've already seen, people routinely use cryptosystems with a 16 byte (i.e., 128 bit)  key but many terabytes of plaintext?
-The proof of [longkeysthm](){.ref} does give in fact a way to break all these cryptosystems, but an examination of this proof shows that it only yields an algorithm with time _exponential in the length of the key_.
-This motivates the following relaxation of perfect secrecy to a condition known as _"computational secrecy"_.
-Intuitively, an encryption scheme is computationally secret if no polynomial time algorithm can break it.
-The formal definition is below:
-
-::: {.definition title="Computational secrecy" #compsecdef}
-Let $(E,D)$ be a valid encryption scheme where for keys of length $n$, the plaintexts are of length $L(n)$ and the ciphertexts are of length $m(n)$.
-We say that $(E,D)$ is _computationally secret_ if for every polynomial $p:\N \rightarrow \N$, and large enough $n$, if $P$ is an $m(n)$-input and single output NAND-CIRC program of at most $p(n)$ lines, and $x_0,x_1 \in \{0,1\}^{L(n)}$  then
-
+设 $(E,D)$ 是一个有效的加密方案，其中对于长度为 $n$ 的密钥，明文长度为 $L(n)$，密文长度为 $m(n)$。如果对于每个多项式 $p:\N \rightarrow \N$ 和足够大的 $n$，若 $P$ 是一个至多包含 $p(n)$ 行代码、具有 $m(n)$ 个输入和单个输出的 NAND-CIRC 程序，并且 $x_0,x_1 \in \{0,1\}^{L(n)}$，那么
 $$
-\left| \E_{k \sim \{0,1\}^n} [P(E_k(x_0))] -   \E_{k \sim \{0,1\}^n} [P(E_k(x_1))] \right| < \tfrac{1}{p(n)} \label{eqindist}
+\left| \E_{k \sim \{0,1\}^n} [P(E_k(x_0))] -   \E_{k \sim \{0,1\}^n} [P(E_k(x_1))] \right| < \tfrac{1}{p(n)} {{numeq}}{eq:eqindist}
 $$
-:::
+```
 
-> ### { .pause }
-[compsecdef](){.ref} requires a second or third read and some practice to truly understand.
-One excellent exercise to make sure you follow it is to see that if we allow $P$ to be an _arbitrary_ function mapping $\{0,1\}^{m(n)}$ to $\{0,1\}$, and we replace the condition in [eqindist](){.eqref} that the left-hand side is smaller than $\tfrac{1}{p(n)}$ with the condition that it is equal to $0$ then we get the perfect secrecy condition of [perfectsecrecy](){.ref}.
-Indeed if the distributions $E_k(x_0)$  and $E_k(x_1)$ are identical then applying any function $P$ to them we get the same expectation.
-On the other hand, if the two distributions above give a different probability for some element $y^*\in \{0,1\}^{m(n)}$, then the function $P(y)$ that outputs $1$ iff $y=y^*$ will have a different expectation under the former distribution than under the latter.
+```admonish pause title="暂停一下"
+要真正理解{{ref:def:compsecdef}}，需要读两到三遍并进行一些练习。一个检验你是否理解了的极好练习是，看看如果我们允许 $P$ 是任意**函数**，将 $\{0,1\}^{m(n)}$ 映射到 $\{0,1\}$，并且将{{eqref:eq:eqindist}}中的条件（左边小于 $\tfrac{1}{p(n)}$）替换为左边等于 $0$，那么我们就得到了{{ref:def:perfectsecrecy}}中的完美保密性条件。事实上，如果分布 $E_k(x_0)$ 和 $E_k(x_1)$ 完全相同，那么对它们应用任何函数 $P$ 都会得到相同的期望值。另一方面，如果上述两个分布对某个元素 $y^*\in \{0,1\}^{m(n)}$ 给出的概率不同，那么函数 $P(y)$（当且仅当 $y=y^*$ 时输出 $1$）在前一个分布下的期望值与在后一个分布下的期望值将不同。
+```
 
+{{ref:def:compsecdef}}提出了两个自然的问题：
 
-[compsecdef](){.ref} raises two natural questions:
+* 它是否足够强，足以确保一个计算保密性的加密方案能够保护其所加密消息的保密性？
+* 它是否足够弱，以至于与完美保密性不同，可以获得一个密钥远小于消息的计算保密性加密方案？
 
-* Is it strong enough to ensure that a computationally secret encryption scheme protects the secrecy of messages that are encrypted with it?
+据我们所知，这两个问题的答案都是**"是"**。这只是一个更广泛现象中的一个例子。我们可以利用计算难度来实现许多密码学目标，包括一些人类梦想了数千年的目标，以及其他一些人们甚至不敢想象的目标。
 
-* It is weak enough that, unlike perfect secrecy, it is possible to obtain a computationally secret encryption scheme where the key is much smaller than the message?
+```admonish bigidea
+{{idec}}{ide:computationcrypto}
 
-To the best of our knowledge, the answer to both questions is _Yes_.
-This is just one example of a much broader phenomenon.
-We can use computational hardness to achieve many cryptographic goals, including some goals that have been dreamed about for millenia, and other goals that people have not even dared to imagine.
+**计算难度**(computational hardness)对于几乎所有密码学应用来说都是**既必要又充分**的。
+```
 
-::: { .bigidea #computationcrypto}
-_Computational hardness_ is _necessary and sufficient_ for almost all cryptographic applications.
-:::
+关于第一个问题，不难证明，例如，如果 Alice 使用一个计算保密的加密算法来加密"攻击"或"撤退"（每个选择的概率为 $1/2$），那么只要她仅限于使用多项式时间算法，即使观察到了其加密形式，敌手 Eve 猜中消息的概率也不可能高于比如 0.51。（我们省略了证明，但这对你来说是一个极好的练习，可以自己尝试解答。）
 
+为了回答第二个问题，我们将证明，在与我们用于去随机化 $\mathbf{BPP}$ 相同的假设下，我们可以获得一个计算保密的密码系统，其中密钥几乎比明文**指数级**地小。
 
-Regarding the first question, it is not hard to show that if, for example,  Alice uses a computationally secret encryption algorithm to encrypt either "attack" or "retreat" (each chosen with probability $1/2$), then as long as she's restricted to polynomial-time algorithms, an adversary Eve will not be able to guess the message with probability better than, say, $0.51$, even after observing its encrypted form. (We omit the proof, but it is an excellent exercise for you to work it out on your own.)
+### 流加密或“去随机化的一次性密码本”
 
-To answer the second question we will show that under the same assumption we used for derandomizing $\mathbf{BPP}$, we can obtain a computationally secret cryptosystem where the key is almost _exponentially_ smaller than the plaintext.
+结果表明，如果存在如最优PRG猜想所述的伪随机生成器，那么存在一种计算上安全的加密方案，其密钥比明文短得多。下面的构造被称为[流加密](https://en.wikipedia.org/wiki/Stream_cipher)（stream cipher），尽管或许更好的名称是“去随机化的一次性密码本”。它在实践中被广泛使用，密钥长度仅为几十或几百比特，却能保护数TB甚至PB的通信。
 
-### Stream ciphers or the "derandomized one-time pad"
+```admonish pic id="derandonetimepadfig"
+![derandonetimepadfig](./images/chapter21/derandonetimepad.png) 
 
-It turns out that if pseudorandom generators exist as in the optimal PRG conjecture, then there exists a computationally secret encryption scheme with keys that are much shorter than the plaintext.
-The construction below is known as a [stream cipher](https://en.wikipedia.org/wiki/Stream_cipher), though perhaps a better name is the "derandomized one-time pad".
-It is widely used in practice with keys on the order of a few tens or hundreds of bits protecting many terabytes or even petabytes of communication.
+{{pic}}{fig:derandonetimepad} 在**流加密**或“去随机化的一次性密码本”中，我们使用一个伪随机生成器 $G:\{0,1\}^n \rightarrow \{0,1\}^L$ 来获得一个密钥长度为 $n$、明文长度为 $L$ 的加密方案。我们使用密钥 $k\in \{0,1\}^n$ 将明文 $x\in \{0,1\}^L$ 加密为密文 $x \oplus G(k)$。
+```
 
+我们首先回顾[定义20.9]()中给出的**伪随机生成器**(pseudorandom generator)的概念。在本章中，我们将采用该定义的一个特例：
 
-![In a _stream cipher_ or "derandomized one-time pad" we use a pseudorandom generator $G:\{0,1\}^n \rightarrow \{0,1\}^L$ to obtain an encryption scheme with a key length of $n$ and plaintexts of length $L$. We encrypt the plaintext $x\in \{0,1\}^L$ with key $k\in \{0,1\}^n$ by the ciphertext $x \oplus G(k)$.](../figure/derandonetimepad.png){#derandonetimepadfig .margin  }
+```admonish quote title=""
+{{defc}}{def:cryptoprg}[密码学伪随机生成器]
 
+设 $L:\N \rightarrow \N$ 为某个函数。一个拉伸度为 $L(\cdot)$的**密码学伪随机生成器**(cryptographic pseudorandom generator)是一个多项式时间可计算的函数 $G:\{0,1\}^* \rightarrow \{0,1\}^*$，使得：
 
-We start by recalling the notion of a _pseudorandom generator_, as defined in [prgdef](){.ref}.
-For this chapter, we will fix a special case of the definition:
-
-::: {.definition title="Cryptographic pseudorandom generator" #cryptoprg}
-Let $L:\N \rightarrow \N$ be some function. A _cryptographic pseudorandom generator_ with stretch $L(\cdot)$ is a polynomial-time computable function $G:\{0,1\}^* \rightarrow \{0,1\}^*$ such that:
-
-* For every $n\in \N$ and $s\in \{0,1\}^n$, $|G(s)|=L(n)$.
-
-* For every polynomial $p:\N \rightarrow \N$ and $n$ large enough, if $C$ is a circuit of $L(n)$ inputs, one output, and at most $p(n)$ gates then
+* 对于每个 $n\in \N$ 和 $s\in \{0,1\}^n$，有 $|G(s)|=L(n)$。
+* 对于每个多项式 $p:\N \rightarrow \N$ 以及足够大的 $n$，如果 $C$ 是一个具有 $L(n)$ 个输入、一个输出且至多 $p(n)$ 个门的电路，那么
 $$
-\left| \Pr_{s\sim \{0,1\}^\ell}[C(G(s))=1] - \Pr_{r \sim \{0,1\}^m}[C(r)=1] \right| < \frac{1}{p(n)} \;.
+\left| \Pr_{s\sim \{0,1\}^\ell}[C(G(s))=1] - \Pr_{r \sim \{0,1\}^m}[C(r)=1] \right| < \frac{1}{p(n)} \;
 $$
-:::
+```
 
-In this chapter we will call a cryptographic pseudorandom generator simply a _pseudorandom generator_ or PRG for short. The optimal PRG conjecture of [optimalprgconj](){.ref} implies
-that there is a pseudorandom generator that can "fool" circuits of _exponential size_ and where the gap in probabilities is at most one over an exponential quantity.
-Since exponential grow faster than every polynomial, the optimal PRG conjecture implies the following:
+在本章中，我们将密码学伪随机生成器简称为**伪随机生成器**或 PRG。[第 20.4.2 节]()的最优 PRG 猜想意味着存在一个伪随机生成器，它可以“欺骗”**指数级大小**的电路，并且概率差异至多为指数级小量。由于指数级增长速度超过任何多项式，最优 PRG 猜想蕴含以下结论：
 
->__The crypto PRG conjecture:__ For every $a \in \N$, there is a cryptographic pseudorandom generator with $L(n)=n^a$.
+```admonish quote title=""
+**密码学 PRG 猜想：** 对于每个 $a \in \N$，存在一个拉伸度为 $L(n)=n^a$ 的密码学伪随机生成器。
+```
 
+密码学 PRG 猜想比最优 PRG 猜想弱，但（正如我们将看到的）它仍然比 $\mathbf{P} \neq \mathbf{NP}$ 猜想更强。
 
-The crypto PRG conjecture is a weaker conjecture than the optimal PRG conjecture, but it too (as we will see) is still stronger than the conjecture that $\mathbf{P} \neq \mathbf{NP}$.
+```admonish quote title=""
+{{thmc}}{thm:PRGtoENC}[去随机化的一次性密码本]
 
+假设密码学 PRG 猜想成立。那么对于每个常数 $a\in \N$，存在一个计算上秘密的加密方案 $(E,D)$，其明文长度 $L(n)$ 至少为 $n^a$。
+```
 
-> ### {.theorem title="Derandomized one-time pad" #PRGtoENC}
-Suppose that the crypto PRG conjecture is true.
-Then for every constant $a\in \N$ there is   a computationally secret encryption scheme $(E,D)$ with plaintext length $L(n)$ at least $n^a$.
+```admonish proof collapsible=true title="{{ref:thm:PRGtoENC}}的证明思路"
+证明过程如{{ref:fig:derandonetimepad}}所示。我们简单地采用针对 $L$ 比特明文的一次性密码本，但将密钥替换为 $G(k)$，其中 $k$ 是 $\{0,1\}^n$ 中的字符串，且 $G:\{0,1\}^n \rightarrow \{0,1\}^L$ 是一个伪随机生成器。由于一次性密码本是不可破译的，任何能攻破去随机化一次性密码本的敌手都可以被用来区分伪随机生成器的输出和均匀分布。
+```
 
-> ### {.proofidea data-ref="PRGtoENC"}
-The proof is illustrated in [derandonetimepadfig](){.ref}. We simply take the one-time pad on $L$ bit plaintexts, but replace the key with $G(k)$ where $k$ is a string in $\{0,1\}^n$ and $G:\{0,1\}^n \rightarrow \{0,1\}^L$ is a pseudorandom generator. Since the one time pad cannot be broken, an adversary that breaks the derandomized one-time pad can be used to distinguish between the output of the pseudorandom generator and the uniform distribution.
+```admonish proof collapsible=true title="{{ref:thm:PRGtoENC}}的证明"
+设 $G:\{0,1\}^n \rightarrow \{0,1\}^L$ （其中 $L = n^a$）是密码学 PRG 猜想保证存在的伪随机生成器 $G$ 在输入长度 $n$ 上的限制。我们现在如下定义加密方案：给定密钥 $k\in \{0,1\}^n$ 和明文 $x\in \{0,1\}^L$，加密 $E_k(x)$ 就是 $x \oplus G(k)$。要解密密文 $y \in \{0,1\}^m$，我们输出 $y \oplus G(k)$。这是一个有效的加密方案，因为 $G$ 可以在多项式时间内计算，并且对于每个 $x\in \{0,1\}^L$，有 $(x \oplus G(k)) \oplus G(k) = x \oplus (G(k) \oplus G(k)) = x$。
 
-::: {.proof data-ref="PRGtoENC"}
-Let  $G:\{0,1\}^n \rightarrow \{0,1\}^L$  for $L = n^a$ be the restriction to input length $n$ of the pseudorandom generator $G$ whose existence we are guaranteed from the crypto PRG conjecture.
-We now define our encryption scheme as follows: given key $k\in \{0,1\}^n$ and plaintext $x\in \{0,1\}^L$, the encryption $E_k(x)$ is simply $x \oplus G(k)$.
-To decrypt a string $y \in \{0,1\}^m$ we output $y \oplus G(k)$.
-This is a valid encryption since $G$ is computable in polynomial time and $(x \oplus G(k)) \oplus G(k) = x \oplus (G(k) \oplus G(k))=x$ for every $x\in \{0,1\}^L$.
-
-Computational secrecy follows from the condition of a pseudorandom generator.
-Suppose, towards a contradiction, that there is a polynomial $p$, NAND-CIRC program $Q$ of at most $p(L)$ lines and  $x,x' \in \{0,1\}^{L(n)}$  such that
+计算上的保密性来自于伪随机生成器的条件。为了得到矛盾，假设存在一个多项式 $p$、一个至多包含 $p(L)$ 行代码的 NAND-CIRC 程序 $Q$，以及 $x,x' \in \{0,1\}^{L(n)}$，使得
 $$
-\left| \E_{k \sim \{0,1\}^n}[ Q(E_k(x))] - \E_{k \sim \{0,1\}^n}[Q(E_k(x'))] \right| > \tfrac{1}{p(L)} \;.
+\left| \E_{k \sim \{0,1\}^n}[ Q(E_k(x))] - \E_{k \sim \{0,1\}^n}[Q(E_k(x'))] \right| > \tfrac{1}{p(L)} \;
 $$
-(We use here the simple fact that for a  $\{0,1\}$-valued random variable $X$, $\Pr[X=1]=\E[X]$.)
+（这里我们使用了一个简单事实：对于一个取值为 $\{0,1\}$ 的随机变量 $X$，有 $\Pr[X=1]=\E[X]$。）
 
-By the definition of our encryption scheme, this means that
+根据我们加密方案的定义，这意味着
 $$
-\left| \E_{k \sim \{0,1\}^n}[ Q(G(k) \oplus x)] - \E_{k \sim \{0,1\}^n}[Q(G(k) \oplus x')] \right| > \tfrac{1}{p(L)} \;. \label{eqprgsecone}
+\left| \E_{k \sim \{0,1\}^n}[ Q(G(k) \oplus x)] - \E_{k \sim \{0,1\}^n}[Q(G(k) \oplus x')] \right| > \tfrac{1}{p(L)} \;{{numeq}}{eq:eqprgsecone}
 $$
 
-Now since (as we saw in the security analysis of the one-time pad), for every strings $x,x'\in \{0,1\}^L$, the distribution $r \oplus x$ and $r \oplus x'$ are identical, where $r\sim \{0,1\}^L$.
-Hence
+现在，由于（正如我们在一次性密码本的安全性分析中看到的）对于每个字符串 $x,x'\in \{0,1\}^L$，分布 $r \oplus x$ 和 $r \oplus x'$ 是相同的，其中 $r\sim \{0,1\}^L$。因此
 $$
-\E_{r \sim \{0,1\}^L} [ Q(r \oplus x)] =  \E_{r \sim \{0,1\}^L} [ Q(r \oplus x')]  \;.  \label{eqprgsectwo}
+\E_{r \sim \{0,1\}^L} [ Q(r \oplus x)] =  \E_{r \sim \{0,1\}^L} [ Q(r \oplus x')]  \;{{numeq}}{eq:eqprgsectwo}
 $$
-By plugging [eqprgsectwo](){.eqref} into [eqprgsecone](){.eqref}  we can derive that
+将{{eqref:eq:eqprgsectwo}}代入{{eqref:eq:eqprgsecone}}，我们可以推导出
 $$
-\left| \E_{k \sim \{0,1\}^n}[ Q(G(k) \oplus x)] - \E_{r \sim \{0,1\}^L} [ Q(r \oplus x)] +  \E_{r \sim \{0,1\}^L} [ Q(r \oplus x')]  -  \E_{k \sim \{0,1\}^n}[Q(G(k) \oplus x')] \right| > \tfrac{1}{p(L)} \;. \label{eqprgsethree}
+\begin{align}
+| &\E_{k \sim \{0,1\}^n}[ Q(G(k) \oplus x)] - \E_{r \sim \{0,1\}^L} [ Q(r \oplus x)] +\\  
+&\E_{r \sim \{0,1\}^L} [ Q(r \oplus x')]  -  \E_{k \sim \{0,1\}^n}[Q(G(k) \oplus x')] | > \tfrac{1}{p(L)} \;
+\end{align} {{numeq}}{eq:eqprgsethree}
 $$
-(Please make sure that you can see why this is true.)
+（请确保你能理解为什么这是正确的。）
 
-Now we can use the _triangle inequality_ that $|A+B| \leq |A|+|B|$ for every two numbers $A,B$, applying it for $A= \E_{k \sim \{0,1\}^n}[ Q(G(k) \oplus x)] - \E_{r \sim \{0,1\}^L} [ Q(r \oplus x)]$ and $B= \E_{r \sim \{0,1\}^L} [ Q(r \oplus x')]  -  \E_{k \sim \{0,1\}^n}[Q(G(k) \oplus x')]$ to derive
+现在我们可以使用**三角不等式** $|A+B| \leq |A|+|B|$（对于任意两个数 $A,B$），将其应用于 $A= \E_{k \sim \{0,1\}^n}[ Q(G(k) \oplus x)] - \E_{r \sim \{0,1\}^L} [ Q(r \oplus x)]$ 和 $B= \E_{r \sim \{0,1\}^L} [ Q(r \oplus x')]  -  \E_{k \sim \{0,1\}^n}[Q(G(k) \oplus x')]$，得到
 $$
-\left| \E_{k \sim \{0,1\}^n}[ Q(G(k) \oplus x)] - \E_{r \sim \{0,1\}^L} [ Q(r \oplus x)] \right| + \left|  \E_{r \sim \{0,1\}^L} [ Q(r \oplus x')]  -  \E_{k \sim \{0,1\}^n}[Q(G(k) \oplus x')] \right| > \tfrac{1}{p(L)} \;. \label{eqprgsefour}
-$$
-
-In particular, either the first term or the second term of the left-hand side of [eqprgsefour](){.eqref} must be at least $\tfrac{1}{2p(L)}$.
-Let us assume the first case holds (the second case is analyzed in exactly the same way).
-Then we get that
-$$
-\left| \E_{k \sim \{0,1\}^n}[ Q(G(k) \oplus x)] - \E_{r \sim \{0,1\}^L} [ Q(r \oplus x)] \right| > \tfrac{1}{2p(L)} \;. \label{distingprgeq}
+\begin{align}
+&\left| \E_{k \sim \{0,1\}^n}[ Q(G(k) \oplus x)] - \E_{r \sim \{0,1\}^L} [ Q(r \oplus x)] \right| +\\
+&\left|  \E_{r \sim \{0,1\}^L} [ Q(r \oplus x')]  -  \E_{k \sim \{0,1\}^n}[Q(G(k) \oplus x')] \right| > \tfrac{1}{p(L)} \;
+\end{align} {{numeq}}{eq:eqprgsefour}
 $$
 
-But if we now define the NAND-CIRC program $P_x$ that on input $r\in \{0,1\}^L$ outputs $Q(r \oplus x)$ then (since XOR of $L$ bits can be computed in $O(L)$ lines), we get that $P_x$ has $p(L)+O(L)$ lines and by [distingprgeq](){.eqref} it can distinguish between an input of the form $G(k)$ and an input of the form $r \sim \{0,1\}^k$ with advantage better than $\tfrac{1}{2p(L)}$.
-Since a polynomial is dominated by an exponential, if we make $L$ large enough, this will contradict the $(2^{\delta n},2^{-\delta n})$ security of the pseudorandom generator $G$.
-:::
+特别地，{{eqref:eq:eqprgsefour}}左侧的第一项或第二项必须至少为 $\tfrac{1}{2p(L)}$。假设第一项成立（第二种情况以完全相同的方式分析）。那么我们得到
+$$
+\left| \E_{k \sim \{0,1\}^n}[ Q(G(k) \oplus x)] - \E_{r \sim \{0,1\}^L} [ Q(r \oplus x)] \right| > \tfrac{1}{2p(L)} \;{{numeq}}{eq:distingprgeq}
+$$
 
+但如果现在定义 NAND-CIRC 程序 $P_x$，它在输入 $r\in \{0,1\}^L$ 时输出 $Q(r \oplus x)$，那么（因为 $L$ 比特的异或可以在 $O(L)$ 行内计算），我们得到 $P_x$ 有 $p(L)+O(L)$ 行，并且根据{{eqref:eq:distingprgeq}}，它能以优于 $\tfrac{1}{2p(L)}$ 的优势区分形式为 $G(k)$ 的输入和形式为 $r \sim \{0,1\}^k$ 的输入。由于多项式受指数级支配，如果我们使 $L$ 足够大，这将与伪随机生成器 $G$ 的 $(2^{\delta n},2^{-\delta n})$ 安全性相矛盾。
+```
 
-> ### {.remark title="Stream ciphers in practice" #streamciphersrem}
-The two most widely used forms of (private key) encryption schemes in practice are _stream ciphers_ and _block ciphers_. (To make things more confusing, a block cipher is always used in some [mode of operation](https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation) and some of these modes effectively turn a block cipher into a stream cipher.)
-A block cipher can be thought as a sort of a "random invertible map" from $\{0,1\}^n$ to $\{0,1\}^n$, and can be used to construct a pseudorandom generator and from it a stream cipher, or to encrypt data directly using other modes of operations.
-There are a great many other security notions and considerations for encryption schemes beyond computational secrecy.
-Many of those involve handling scenarios such as _chosen plaintext_, _man in the middle_, and _chosen ciphertext_ attacks, where the adversary is not just merely a passive eavesdropper but can influence the communication in some way.
-While this chapter is meant to give you some taste of the ideas behind cryptography, there is much more to know before applying it correctly to obtain secure applications, and a great many people have managed to get it wrong.
+```admonish info
+{{remc}}{rem:streamciphersrem}[实践中的流加密]
+
+实践中两种最广泛使用的（私钥）加密方案是**流加密**和**分组加密**。（更令人困惑的是，分组加密总是在某种[操作模式](https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation)下使用，而其中一些模式有效地将分组加密转换为流加密。）分组加密可以被认为是某种从 $\{0,1\}^n$ 到 $\{0,1\}^n$ 的“随机可逆映射”，并且可用于构造伪随机生成器，进而构造流加密，或使用其他操作模式直接加密数据。除了计算上的保密性之外，加密方案还有大量其他的安全概念和考虑因素。其中许多涉及处理诸如**选择明文**、**中间人**和**选择密文**攻击等场景，在这些场景中，敌手不仅仅是被动的窃听者，而是可以某种方式影响通信。虽然本章旨在让你初步了解密码学背后的思想，但在正确应用它以获得安全应用之前，还有更多东西需要了解，并且已经有很多人在这方面犯过错误。
+```
 
 ## Computational secrecy and $\mathbf{NP}$
 
